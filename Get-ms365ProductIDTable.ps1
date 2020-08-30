@@ -38,6 +38,9 @@
 .EXAMPLE
     PS C:\> .\Get-ms365ProductIDTable.ps1 | Export-Csv -NoTypeInformation .\O365-License-Reference.csv
     Get the product names and service plan identifiers online and export to CSV
+.EXAMPLE
+    PS C:\> .\Get-ms365ProductIDTable.ps1
+    Get the product names and service plan identifiers online and display the result on the screen
 #>
 
 [CmdletBinding()]
@@ -45,11 +48,19 @@ param (
 
 )
 
-## This is the licensing reference table document from GitHub
-[string]$URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/users-groups-roles/licensing-service-plan-reference.md'
+$ErrorActionPreference = 'STOP'
+
+## This is URL path to the the licensing reference table document from GitHub
+[string]$URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/users-groups-roles/licensing-service-plan-reference.m'
 
 ## Download the string value of the MD file
-[System.Collections.ArrayList]$raw_Table = ((New-Object System.Net.WebClient).DownloadString($URL) -split "`n")
+try {
+    [System.Collections.ArrayList]$raw_Table = ((New-Object System.Net.WebClient).DownloadString($URL) -split "`n")
+}
+catch {
+    Write-Output "There was an error getting the licensing reference table online.`n$($_.Exception.Message)"
+    return $null
+}
 
 ## Determine the starting row index of the table
 $startLine = $raw_Table.IndexOf('| Product name | String ID | GUID | Service plans included | Service plans included (friendly names) |')
@@ -76,4 +87,5 @@ $result = $result `
 ## Create the result object
 $result = ($result | ConvertFrom-Csv -Delimiter "|" -Header 'LicenseName', 'LicenseString', 'LicenseGUID', 'ServicePlans', 'ServicePlansFriendlyNames')
 
+## return the result
 return $result
