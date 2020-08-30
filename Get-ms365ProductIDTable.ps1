@@ -51,7 +51,7 @@ param (
 $ErrorActionPreference = 'STOP'
 
 ## This is URL path to the the licensing reference table document from GitHub
-[string]$URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/users-groups-roles/licensing-service-plan-reference.m'
+[string]$URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/users-groups-roles/licensing-service-plan-reference.md'
 
 ## Download the string value of the MD file
 try {
@@ -59,7 +59,7 @@ try {
 }
 catch {
     Write-Output "There was an error getting the licensing reference table online.`n$($_.Exception.Message)"
-    return $null
+    break;
 }
 
 ## Determine the starting row index of the table
