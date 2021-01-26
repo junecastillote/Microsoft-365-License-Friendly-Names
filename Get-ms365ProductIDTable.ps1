@@ -51,7 +51,7 @@ param (
 $ErrorActionPreference = 'STOP'
 
 ## This is URL path to the the licensing reference table document from GitHub
-[string]$URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/users-groups-roles/licensing-service-plan-reference.md'
+[string]$URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/enterprise-users/licensing-service-plan-reference.md'
 
 ## Download the string value of the MD file
 try {
