@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0
+.VERSION 1.1
 
 .GUID 79801e88-d136-4955-8730-07ae1dd65cb1
 
@@ -53,6 +53,8 @@ $ErrorActionPreference = 'STOP'
 ## This is URL path to the the licensing reference table document from GitHub
 [string]$URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/enterprise-users/licensing-service-plan-reference.md'
 
+#https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/licensing-service-plan-reference
+
 ## Download the string value of the MD file
 try {
     [System.Collections.ArrayList]$raw_Table = ((New-Object System.Net.WebClient).DownloadString($URL) -split "`n")
@@ -85,7 +87,15 @@ $result = $result `
     -replace '\)\s*\(', ')('
 
 ## Create the result object
-$result = ($result | ConvertFrom-Csv -Delimiter "|" -Header 'LicenseName', 'LicenseString', 'LicenseGUID', 'ServicePlans', 'ServicePlansFriendlyNames')
+$result = @($result | ConvertFrom-Csv -Delimiter "|" -Header 'LicenseName', 'LicenseString', 'LicenseGUID', 'ServicePlans', 'ServicePlansFriendlyNames')
+
+## Convert product name to title case
+$TextInfo = (Get-Culture).TextInfo
+$i=0
+$result | ForEach-Object {
+    $result[$i].LicenseName = $TextInfo.ToTitleCase(($PSItem.LicenseName).ToLower())
+    $i++
+}
 
 ## return the result
 return $result
