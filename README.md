@@ -3,7 +3,9 @@ Get license IDs and friendly names directly from MS article source in GitHub tha
 
 ## How to Get
 
-Download or clone the script from this repository or install from PowerShell gallery.
+**Option 1** - [Download](https://github.com/junecastillote/Microsoft-365-License-Friendly-Names/archive/refs/heads/master.zip) or [Clone](https://github.com/junecastillote/Microsoft-365-License-Friendly-Names.git) the script from this repository.
+
+**Option 2** - Install from [PowerShell Gallery](https://www.powershellgallery.com/packages/Get-m365ProductIDTable).
 
 ```PowerShell
 Install-Script -Name Get-m365ProductIDTable
