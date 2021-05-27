@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.1
+.VERSION 1.2
 
 .GUID 79801e88-d136-4955-8730-07ae1dd65cb1
 
@@ -36,32 +36,43 @@
 .DESCRIPTION
     This script downloads and parses the licensing-service-plan-reference.md file from GitHub and converts to a PowerShell object.
 .EXAMPLE
-    PS C:\> .\Get-ms365ProductIDTable.ps1 | Export-Csv -NoTypeInformation .\O365-License-Reference.csv
+    PS C:\> .\Get-m365ProductIDTable.ps1 | Export-Csv -NoTypeInformation .\m365-License-Reference.csv
     Get the product names and service plan identifiers online and export to CSV
 .EXAMPLE
-    PS C:\> .\Get-ms365ProductIDTable.ps1
+    PS C:\> .\Get-m365ProductIDTable.ps1
     Get the product names and service plan identifiers online and display the result on the screen
+.EXAMPLE
+    PS C:\> .\Get-m365ProductIDTable.ps1 -TitleCase
+    Get the product names and service plan identifiers online and display the result on the screen. The friendly names will be convered to title case.
 #>
 
 [CmdletBinding()]
 param (
+    ## This is URL path to the the licensing reference table document from GitHub.
+    ## The current working URL is the default value.
+    ## In case Microsoft moved the document, use this parameter to point to the new URL.
+    [parameter()]
+    [string]
+    $URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/enterprise-users/licensing-service-plan-reference.md',
 
+    ## Convert license names to title case.
+    [parameter()]
+    [switch]
+    $TitleCase
 )
 
 $ErrorActionPreference = 'STOP'
 
-## This is URL path to the the licensing reference table document from GitHub
-[string]$URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/enterprise-users/licensing-service-plan-reference.md'
-
 #https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/licensing-service-plan-reference
 
-## Download the string value of the MD file
+## Parse the Markdown Table from the $URL
 try {
     [System.Collections.ArrayList]$raw_Table = ((New-Object System.Net.WebClient).DownloadString($URL) -split "`n")
 }
 catch {
-    Write-Output "There was an error getting the licensing reference table online.`n$($_.Exception.Message)"
-    break;
+    Write-Output "There was an error getting the licensing reference table at [$URL]. Please make sure that the URL is still valid."
+    Write-Output $_.Exception.Message
+    return $null
 }
 
 ## Determine the starting row index of the table
@@ -79,23 +90,33 @@ for ($i = $startLine; $i -lt $endLine; $i++) {
 }
 
 ## Perform a little clean-up
+### replace "[space] | [space]" with "|"
+### replace "[space]<br/>[space]" with ","
+### replace "((" with "("
+### replace "))" with ")"
+### #replace ")[space](" with ")("
+
 $result = $result `
     -replace '\s*\|\s*', '|' `
-    -replace '\s*<br/>\s*', ';' `
+    -replace '\s*<br/>\s*', ',' `
     -replace '\(\(', '(' `
     -replace '\)\)', ')' `
     -replace '\)\s*\(', ')('
 
 ## Create the result object
-$result = @($result | ConvertFrom-Csv -Delimiter "|" -Header 'LicenseName', 'LicenseString', 'LicenseGUID', 'ServicePlans', 'ServicePlansFriendlyNames')
+$result = @($result | ConvertFrom-Csv -Delimiter "|" -Header 'SkuName', 'SkuPartNumber', 'SkuID', 'ChildServicePlan', 'ChildServicePlanName')
 
-## Convert product name to title case
-$TextInfo = (Get-Culture).TextInfo
-$i=0
-$result | ForEach-Object {
-    $result[$i].LicenseName = $TextInfo.ToTitleCase(($PSItem.LicenseName).ToLower())
-    $i++
+if ($TitleCase) {
+    ## Convert product name to title case
+    $TextInfo = (Get-Culture).TextInfo
+    $i = 0
+    $result | ForEach-Object {
+        $result[$i].SkuName = $TextInfo.ToTitleCase(($PSItem.SkuName).ToLower())
+        $result[$i].ChildServicePlanName = $TextInfo.ToTitleCase(($PSItem.ChildServicePlanName).ToLower())
+        $i++
+    }
 }
+
 
 ## return the result
 return $result
