@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.2
+.VERSION 1.2.1
 
 .GUID 79801e88-d136-4955-8730-07ae1dd65cb1
 
@@ -24,7 +24,7 @@
 
 .EXTERNALSCRIPTDEPENDENCIES
 
-.RELEASENOTES
+.RELEASENOTES 2021-07-07 | v1.2.1 | performance tweeks by Maximilian Otter
 
 #>
 
@@ -67,7 +67,7 @@ $ErrorActionPreference = 'STOP'
 
 ## Parse the Markdown Table from the $URL
 try {
-    [System.Collections.ArrayList]$raw_Table = ((New-Object System.Net.WebClient).DownloadString($URL) -split "`n")
+    [System.Collections.ArrayList]$raw_Table = ([System.Net.WebClient]::new()).DownloadString($URL).split("`n")
 }
 catch {
     Write-Output "There was an error getting the licensing reference table at [$URL]. Please make sure that the URL is still valid."
@@ -82,10 +82,9 @@ $startLine = $raw_Table.IndexOf('| Product name | String ID | GUID | Service pla
 $endLine = ($raw_Table.IndexOf('## Service plans that cannot be assigned at the same time') - 1)
 
 ## Extract the string in between the lines $startLine and $endLine
-$result = @()
-for ($i = $startLine; $i -lt $endLine; $i++) {
+$result = for ($i = $startLine; $i -lt $endLine; $i++) {
     if ($raw_Table[$i] -notlike "*---*") {
-        $result += ($raw_Table[$i].Substring(1, $raw_Table[$i].Length - 1))
+        $raw_Table[$i].Substring(1, $raw_Table[$i].Length - 1)
     }
 }
 
@@ -107,14 +106,14 @@ $result = $result `
 $result = @($result | ConvertFrom-Csv -Delimiter "|" -Header 'SkuName', 'SkuPartNumber', 'SkuID', 'ChildServicePlan', 'ChildServicePlanName')
 
 if ($TitleCase) {
+
     ## Convert product name to title case
     $TextInfo = (Get-Culture).TextInfo
-    $i = 0
-    $result | ForEach-Object {
-        $result[$i].SkuName = $TextInfo.ToTitleCase(($PSItem.SkuName).ToLower())
-        $result[$i].ChildServicePlanName = $TextInfo.ToTitleCase(($PSItem.ChildServicePlanName).ToLower())
-        $i++
+    for ($i = 0; $i -lt $result.Count; $i++) {
+        $result[$i].SkuName = $TextInfo.ToTitleCase(($result[$i].SkuName).ToLower())
+        $result[$i].ChildServicePlanName = $TextInfo.ToTitleCase(($result[$i].ChildServicePlanName).ToLower())
     }
+
 }
 
 
