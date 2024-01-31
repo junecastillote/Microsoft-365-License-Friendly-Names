@@ -53,7 +53,7 @@ param (
     ## In case Microsoft moved the document, use this parameter to point to the new URL.
     [parameter()]
     [string]
-    $URL = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/master/articles/active-directory/enterprise-users/licensing-service-plan-reference.md',
+    $URL = 'https://raw.githubusercontent.com/MicrosoftDocs/entra-docs/main/docs/identity/users/licensing-service-plan-reference.md',
 
     ## Convert license names to title case.
     [parameter()]
@@ -63,7 +63,7 @@ param (
 
 $ErrorActionPreference = 'STOP'
 
-#https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/licensing-service-plan-reference
+#https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference
 
 ## Parse the Markdown Table from the $URL
 try {
