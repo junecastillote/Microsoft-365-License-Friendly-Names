@@ -10,7 +10,7 @@
 
 .COPYRIGHT june.castillote@gmail.com
 
-.TAGS Office365 License Friendly
+.TAGS Office365 License Friendly Microsoft365
 
 .LICENSEURI https://github.com/junecastillote/Microsoft-365-License-Friendly-Names/blob/master/LICENSE
 
