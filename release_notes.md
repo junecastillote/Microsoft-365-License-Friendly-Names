@@ -1,5 +1,15 @@
 # Release Notes
 
+## v1.4 (2025-08-28)
+
+- Added the `-SkuPartNumber` parameter.
+  - Return only the matching SkuPartNumber
+- Added a DefaultDisplayPropertySet to show only 'SkuName', 'SkuPartNumber', 'SkuId' by default.
+- Forced `-TitleCase` value to `$true` if not specified.
+- Replace `System.Net.WebClient` with `Invoke-RestMethod` native cmdlet.
+- Added `-ListDelimiterCharacter` parameter to customize how the `ChildServicePlan` and `ChildServicePlan` list is delimited.
+  - If not specified, the default delimiter is comma `,`
+
 ## v1.3 (2025-03-29)
 
 - Added the `-SkuId [GUID]` parameter.
