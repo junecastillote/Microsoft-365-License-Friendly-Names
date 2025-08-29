@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.4
+.VERSION 1.4.1
 
 .GUID 79801e88-d136-4955-8730-07ae1dd65cb1
 
@@ -64,13 +64,13 @@ param (
     # Return only the matching SkuId
     [Parameter(ParameterSetName = 'SkuId', Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [guid]
+    [guid[]]
     $SkuId,
 
     # Return only the matching SkuPartNumber
     [Parameter(ParameterSetName = 'SkuPartNumber', Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [string]
+    [string[]]
     $SkuPartNumber,
 
     ## Force convert license names to title case.
@@ -99,12 +99,16 @@ function ShowResult {
         # -SkuId <GUID>
         SkuId {
             Write-Verbose "Filtering by SkuId"
-            $Global:SkuTable | Where-Object { $_.SkuId -eq $SkuId }
+            foreach ($id in $SkuId) {
+                $Global:SkuTable | Where-Object { $_.SkuId -eq $id }
+            }
         }
         # -SkuPartNumber <SKU PART NUMBER>
         SkuPartNumber {
             Write-Verbose "Filtering by SkuPartNumber"
-            $Global:SkuTable | Where-Object { $_.SkuPartNumber -eq $SkuPartNumber }
+            foreach ($partNumber in $SkuPartNumber) {
+                $Global:SkuTable | Where-Object { $_.SkuPartNumber -eq $partNumber }
+            }
         }
         default {
             Write-Verbose "No filtering. Showing all results."
