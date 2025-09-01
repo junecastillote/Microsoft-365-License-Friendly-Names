@@ -1,5 +1,9 @@
 # Release Notes
 
+## v1.4.1 (2025-08-29)
+
+- Parameters `-SkuId` and `-SkuPartNumber` now accepts multiple items.
+
 ## v1.4 (2025-08-28)
 
 - Added the `-SkuPartNumber` parameter.
